@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSSC Clerk Typing Exam Simulator | Punjab & Haryana High Court</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">
+        <i class="fa-solid fa-keyboard"></i>
+      </div>
+      <div>
+        <h1>
+          SSSC Clerk Typing Exam Simulator
+          <span class="logo-subtitle">Punjab & Haryana High Court Practice Regulations</span>
+        </h1>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <!-- Theme Switches -->
+      <div class="flex-row gap-sm" style="margin-right: 1.5rem;">
+        <i class="fa-solid fa-circle-half-stroke" style="font-size: 1.1rem; color: var(--text-secondary);"></i>
+        <label class="theme-switch" title="Toggle Light/Dark Mode">
+          <input type="checkbox" id="themeToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button id="examModeBtn" class="btn" title="Toggle official SSSC exam look-and-feel">
+        <i class="fa-solid fa-building-columns"></i> SSSC Exam Mode: OFF
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="app-container">
+
+    <!-- Top Dashboard Configuration & Quick Stats -->
+    <div class="dashboard-grid">
+      
+      <!-- Settings Panel -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-sliders text-accent"></i> Exam & Practice Configuration
+        </div>
+        <div class="config-grid">
+          <div class="form-group">
+            <label for="langSelect">Language & Layout</label>
+            <select id="langSelect">
+              <option value="english">English (QWERTY)</option>
+              <option value="punjabi">Punjabi (Raavi - Inscript Mapping)</option>
+              <option value="hindi">Hindi (Mangal - Inscript Mapping)</option>
+              <option value="hindi_remington">Hindi (Mangal - Remington Gail)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="passageSelect">Select Passage</label>
+            <select id="passageSelect">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="timeLimit">Duration</label>
+            <select id="timeLimit">
+              <option value="600">10 Minutes (Exam Standard)</option>
+              <option value="300">5 Minutes</option>
+              <option value="120">2 Minutes</option>
+              <option value="60">1 Minute</option>
+            </select>
+          </div>
+
+          <!-- Togglable Options -->
+          <div class="form-group" style="justify-content: center; gap: 0.75rem;">
+            <label class="checkbox-group" title="Allows you to correct mistakes. SSSC allows Backspace.">
+              <input type="checkbox" id="allowBackspace" checked>
+              <span>Enable Backspace</span>
+            </label>
+            <label class="checkbox-group" title="Highlights correct/incorrect letters during practice. Disabling mimics the real exam.">
+              <input type="checkbox" id="highlightWords" checked>
+              <span>Highlight Current Word</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time Stats Panel -->
+      <div class="card">
+        <div class="stats-container">
+          <div class="stat-box timer-box">
+            <div id="timeLeft" class="stat-val">10:00</div>
+            <div class="stat-lbl">TIME REMAINING</div>
+          </div>
+          <div class="stat-box">
+            <div id="liveWpm" class="stat-val">0</div>
+            <div class="stat-lbl">NET SPEED (WPM)</div>
+          </div>
+          <div class="stat-box">
+            <div id="liveAccuracy" class="stat-val">0%</div>
+            <div class="stat-lbl">ACCURACY</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode Selector Cards -->
+    <div class="flex-row" style="gap: 1rem;">
+      <button id="modeOnScreen" class="btn btn-primary" style="flex: 1; padding: 0.75rem;">
+        <i class="fa-solid fa-display"></i> On-Screen Typing Practice
+      </button>
+      <button id="modePaper" class="btn" style="flex: 1; padding: 0.75rem;">
+        <i class="fa-solid fa-file-invoice"></i> Paper-to-Screen Simulation
+      </button>
+    </div>
+
+    <!-- Main Typing Arena -->
+    <div class="arena-grid">
+      
+      <!-- Source Panel (Passage display) -->
+      <div class="source-panel" id="sourcePanel">
+        <div class="panel-header">
+          <span id="passageTitle">Loading Passage...</span>
+          <span id="passageWordCount" style="font-size: 0.75rem; font-weight: normal;">Words: 0</span>
+        </div>
+        <div id="sourceText" class="source-text-box">
+          <!-- Text loaded dynamically -->
+        </div>
+        <!-- Paper Mode Overlay (Hidden initially) -->
+        <div id="paperOverlay" class="paper-mode-overlay" style="display: none;">
+          <i class="fa-solid fa-file-circle-check" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 1rem;"></i>
+          <h3>Paper-to-Screen Simulation Active</h3>
+          <p>Please print or look at your physical test paper. The text has been hidden to simulate official exam conditions.</p>
+          <button id="printPassageBtn" class="btn">
+            <i class="fa-solid fa-print"></i> View/Print Passage Reference
+          </button>
+        </div>
+      </div>
+
+      <!-- Typing Input Box -->
+      <div class="input-panel">
+        <textarea id="typingBox" class="typing-input" placeholder="Click here and start typing to begin the test..." disabled></textarea>
+        <div class="flex-row" style="justify-content: space-between; margin-top: 0.75rem;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary);" id="examFormulaNote">
+            *Official SSSC formula: <strong>Net Speed = (Total Words Typed - Mistakes) / 10</strong>
+          </div>
+          <div class="flex-row gap-sm">
+            <button id="startBtn" class="btn btn-primary">
+              <i class="fa-solid fa-play"></i> Start Test
+            </button>
+            <button id="resetBtn" class="btn">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Interactive Virtual Keyboard -->
+    <div class="keyboard-panel" id="virtualKeyboard">
+      <div class="keyboard-guide">
+        <span><i class="fa-regular fa-lightbulb"></i> On-screen QWERTY mapping maps keystrokes to Punjabi/Hindi Unicode.</span>
+        <span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#ec4899;"></span>L Pinky</span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#a855f7;"></span>L Ring</span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#6366f1;"></span>L Middle</span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#3b82f6;"></span>L Index</span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#f59e0b;"></span>Thumbs</span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#06b6d4;"></span>R Index</span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#14b8a6;"></span>R Middle</span>
+          <span style="margin-right: 10px;"><span class="color-dot" style="background:#10b981;"></span>R Ring</span>
+          <span><span class="color-dot" style="background:#84cc16;"></span>R Pinky</span>
+        </span>
+      </div>
+      <!-- Row 1 -->
+      <div class="keyboard-row" id="kbRow1"></div>
+      <!-- Row 2 -->
+      <div class="keyboard-row" id="kbRow2"></div>
+      <!-- Row 3 -->
+      <div class="keyboard-row" id="kbRow3"></div>
+      <!-- Row 4 -->
+      <div class="keyboard-row" id="kbRow4"></div>
+      <!-- Row 5 -->
+      <div class="keyboard-row" id="kbRow5"></div>
+    </div>
+
+    <!-- Secondary Grid: History & Custom Passage -->
+    <div class="secondary-grid">
+      
+      <!-- Custom Passage Loader -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-file-import text-accent"></i> Custom Practice Passage
+        </div>
+        <textarea id="customPassageText" class="custom-passage-area" placeholder="Paste your own legal judgement text or general paragraph here..."></textarea>
+        <div class="flex-row" style="justify-content: space-between;">
+          <select id="customPassageLang">
+            <option value="english">English</option>
+            <option value="punjabi">Punjabi</option>
+            <option value="hindi">Hindi</option>
+          </select>
+          <button id="loadCustomBtn" class="btn btn-primary">
+            <i class="fa-solid fa-check"></i> Load Custom Passage
+          </button>
+        </div>
+      </div>
+
+      <!-- Practice History -->
+      <div class="card">
+        <div class="card-title" style="justify-content: space-between;">
+          <span><i class="fa-solid fa-clock-rotate-left text-accent"></i> Practice History Log</span>
+          <button id="clearHistoryBtn" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+            Clear All
+          </button>
+        </div>
+        <div id="historyList" class="history-list">
+          <div style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
+            No practice logs yet. Complete a test to see your history!
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Results Dashboard Modal -->
+  <div class="results-modal" id="resultsModal">
+    <div class="results-content">
+      
+      <div class="results-header">
+        <h2 style="font-size: 1.4rem;"><i class="fa-solid fa-chart-line"></i> Exam Performance Results</h2>
+        <button id="closeResultsBtn" class="btn" style="background: transparent; border: none; color: white; font-size: 1.25rem;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="results-body">
+        
+        <!-- Qualification Banner -->
+        <div id="qualifyBanner" class="result-card" style="grid-column: span 3; font-size: 1.4rem; padding: 1.5rem; font-weight: 700; border-radius: 16px;">
+          <!-- QUALIFIED / NOT QUALIFIED -->
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="results-grid">
+          
+          <div class="result-card" id="netSpeedCard">
+            <div id="resNetWpm" class="result-val">0</div>
+            <div class="result-lbl">NET SPEED (WPM)</div>
+          </div>
+          
+          <div class="result-card">
+            <div id="resGrossWpm" class="result-val">0</div>
+            <div class="result-lbl">GROSS SPEED (WPM)</div>
+          </div>
+
+          <div class="result-card" id="accuracyCard">
+            <div id="resAccuracy" class="result-val">0%</div>
+            <div class="result-lbl">ACCURACY</div>
+          </div>
+
+          <div class="result-card" id="mistakesCard">
+            <div id="resMistakes" class="result-val">0</div>
+            <div class="result-lbl">TOTAL MISTAKES</div>
+          </div>
+
+          <div class="result-card">
+            <div id="resTime" class="result-val">10:00</div>
+            <div class="result-lbl">TIME ELAPSED</div>
+          </div>
+        </div>
+
+        <!-- Evaluation Details Diff -->
+        <div>
+          <div class="diff-container">
+            <div class="diff-header">
+              <i class="fa-solid fa-file-prescription"></i> Mistake Breakdown & Comparison
+            </div>
+            <div id="diffViewer" class="diff-body">
+              <!-- Interactive Diff Output -->
+            </div>
+          </div>
+          <div class="diff-legend">
+            <div class="legend-item"><span class="legend-color" style="background: #10b981;"></span> Correct</div>
+            <div class="legend-item"><span class="legend-color" style="background: #f43f5e; text-decoration: line-through;"></span> Incorrect (Spelling Error)</div>
+            <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> Omitted Word (Skipped)</div>
+            <div class="legend-item"><span class="legend-color" style="background: #f59e0b;"></span> Extra Word (Inserted)</div>
+          </div>
+        </div>
+
+        <!-- Real-time chart of speed progression -->
+        <div>
+          <h4>Speed Progression Timeline</h4>
+          <div class="chart-container">
+            <canvas id="speedChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex-row" style="justify-content: flex-end; gap: 1rem;">
+          <button id="retestBtn" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+            <i class="fa-solid fa-rotate-left"></i> Retest Same Passage
+          </button>
+          <button id="okResultsBtn" class="btn" style="padding: 0.75rem 1.5rem;">
+            Close Results
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Reference Preview (for printing / showing paper passage) -->
+  <div class="results-modal" id="referenceModal">
+    <div class="results-content" style="max-width: 650px;">
+      <div class="results-header" style="background: var(--accent-gradient);">
+        <h2>Passage Reference Sheet</h2>
+        <button id="closeRefBtn" class="btn" style="background: transparent; border: none; color: white; font-size: 1.25rem;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="results-body">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Use this printed copy or read panel to type in the Paper-to-Screen Mode.
+        </p>
+        <div id="printableArea" style="border: 1px solid #7f8c8d; padding: 2rem; background: white; color: black; font-family: 'Times New Roman', Times, serif; font-size: 1.25rem; line-height: 1.6; white-space: pre-wrap;">
+          <!-- Text loaded dynamically -->
+        </div>
+        <div class="flex-row" style="justify-content: flex-end; gap: 1rem;">
+          <button id="printBtn" class="btn btn-primary">
+            <i class="fa-solid fa-print"></i> Print Passage
+          </button>
+          <button id="closeRefOkBtn" class="btn">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script references -->
+  <script src="passages.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

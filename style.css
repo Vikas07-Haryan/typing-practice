@@ -1,0 +1,1098 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Dark Theme Variables (Default) */
+  --bg-color: #0b0f19;
+  --card-bg: rgba(22, 30, 49, 0.7);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --accent-color: #06b6d4;
+  --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  --success-color: #10b981;
+  --error-color: #f43f5e;
+  --warning-color: #f59e0b;
+  --current-word-bg: rgba(59, 130, 246, 0.2);
+  --current-word-border: #3b82f6;
+  --keyboard-key-bg: #1e293b;
+  --keyboard-key-active: #3b82f6;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  --scrollbar-bg: #1e293b;
+  --scrollbar-thumb: #334155;
+  --panel-header-bg: #111827;
+  
+  /* SSSC Exam Layout Colors (Toggled via Theme) */
+  --exam-bg: #f3f4f6;
+  --exam-card: #ffffff;
+  --exam-text: #111827;
+  --exam-border: #9ca3af;
+  --exam-header: #1e3a8a;
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+}
+
+/* Light Theme Variables */
+[data-theme="light"] {
+  --bg-color: #f8fafc;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --accent-color: #2563eb;
+  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  --success-color: #059669;
+  --error-color: #dc2626;
+  --warning-color: #d97706;
+  --current-word-bg: rgba(37, 99, 235, 0.1);
+  --current-word-border: #2563eb;
+  --keyboard-key-bg: #e2e8f0;
+  --keyboard-key-active: #2563eb;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --scrollbar-bg: #e2e8f0;
+  --scrollbar-thumb: #cbd5e1;
+  --panel-header-bg: #f1f5f9;
+}
+
+/* SSSC Exam Interface Mode */
+.sssc-exam-theme {
+  --bg-color: #e5e7eb;
+  --card-bg: #ffffff;
+  --card-border: #7f8c8d;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --accent-color: #002244;
+  --accent-gradient: none;
+  --success-color: #008000;
+  --error-color: #ff0000;
+  --warning-color: #ff8c00;
+  --current-word-bg: transparent;
+  --current-word-border: none;
+  --keyboard-key-bg: #d1d5db;
+  --keyboard-key-active: #002244;
+  --panel-header-bg: #002244;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* Header & Navigation */
+header {
+  background: rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px border var(--card-border);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.sssc-exam-theme header {
+  background: #002244;
+  color: #ffffff;
+  border-bottom: 2px solid #000000;
+  padding: 0.5rem 1rem;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-container h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.sssc-exam-theme .logo-container h1 {
+  background: none;
+  -webkit-text-fill-color: #ffffff;
+  font-size: 1.25rem;
+}
+
+.logo-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.sssc-exam-theme .logo-subtitle {
+  color: #dddddd;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--accent-gradient);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 10px rgba(6, 182, 212, 0.3);
+}
+
+.sssc-exam-theme .logo-icon {
+  background: #ffffff;
+  color: #002244;
+  border-radius: 4px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-color);
+}
+
+.btn-primary {
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.sssc-exam-theme .btn {
+  border-radius: 2px;
+  border: 1px solid #7f8c8d;
+  background: #f3f4f6;
+  color: #000;
+}
+.sssc-exam-theme .btn:hover {
+  background: #e5e7eb;
+}
+.sssc-exam-theme .btn-primary {
+  background: #002244;
+  color: white;
+}
+
+/* Theme Switcher */
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #334155;
+  transition: .4s;
+  border-radius: 34px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: #06b6d4;
+}
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* Layout Container */
+.app-container {
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sssc-exam-theme .app-container {
+  max-width: 100%;
+  padding: 1rem;
+}
+
+/* Config & Stats Panels */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 968px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+  transition: all var(--transition-normal);
+}
+
+.sssc-exam-theme .card {
+  border-radius: 0px;
+  border: 1px solid #7f8c8d;
+  box-shadow: none;
+  background: #ffffff;
+  padding: 1rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.sssc-exam-theme .card-title {
+  border-bottom: 1px solid #7f8c8d;
+  padding-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Config Grid */
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.form-group select, .form-group input {
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border var(--transition-fast);
+}
+
+.form-group select:focus, .form-group input:focus {
+  border-color: var(--accent-color);
+}
+
+.sssc-exam-theme .form-group select, .sssc-exam-theme .form-group input {
+  border-radius: 0px;
+  border: 1px solid #7f8c8d;
+  background: #ffffff;
+  color: #000000;
+}
+
+/* Custom Checkbox */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.checkbox-group input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Stats panel */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.sssc-exam-theme .stat-box {
+  border-radius: 0;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.stat-val {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-lbl {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Timer Specific formatting */
+.timer-box {
+  grid-column: span 2;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.timer-box .stat-val {
+  font-size: 2.2rem;
+  color: var(--text-primary);
+}
+
+.sssc-exam-theme .timer-box {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+}
+.sssc-exam-theme .timer-box .stat-val {
+  color: #dc2626;
+}
+
+/* Main Typing Arena */
+.arena-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.sssc-exam-theme .arena-grid {
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+/* Source text display */
+.source-panel {
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+}
+
+.sssc-exam-theme .source-panel {
+  height: 200px;
+}
+
+.panel-header {
+  background: #0f172a !important; /* Dark slate background always for modern theme */
+  color: #ffffff !important; /* White text always */
+  padding: 0.5rem 1rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.sssc-exam-theme .panel-header {
+  background: #002244 !important;
+  color: #ffffff !important;
+  border-radius: 0;
+  border: 1px solid #000000;
+}
+
+.source-text-box {
+  background: rgba(0, 0, 0, 0.2);
+  flex: 1;
+  padding: 1.25rem;
+  overflow-y: auto;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  letter-spacing: 0.5px;
+  user-select: none;
+  white-space: pre-wrap;
+}
+
+.sssc-exam-theme .source-text-box {
+  background: #ffffff;
+  border: 1px solid #7f8c8d;
+  border-top: none;
+  border-radius: 0;
+  color: #000000;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  font-family: Arial, sans-serif;
+}
+
+/* Letter elements */
+.char {
+  position: relative;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+}
+
+.sssc-exam-theme .char {
+  color: #555555;
+}
+
+.char.correct {
+  color: var(--success-color);
+}
+
+.char.incorrect {
+  color: var(--error-color);
+  background: rgba(244, 63, 94, 0.15);
+  border-bottom: 2px solid var(--error-color);
+}
+
+.sssc-exam-theme .char.incorrect {
+  background: #ffcccc;
+  border-bottom: none;
+}
+
+.char.current {
+  color: var(--text-primary);
+  background: var(--current-word-bg);
+  border-bottom: 2px solid var(--current-word-border);
+  animation: blink 1s infinite alternate;
+}
+
+.sssc-exam-theme .char.current {
+  color: #000000;
+  background: #ffffcc;
+  border-bottom: 2px solid #000000;
+  animation: none;
+}
+
+@keyframes blink {
+  0% { border-bottom-color: var(--current-word-border); }
+  100% { border-bottom-color: transparent; }
+}
+
+/* Hidden Paper-to-Screen Notification overlay */
+.paper-mode-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.9);
+  padding: 2rem;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.sssc-exam-theme .paper-mode-overlay {
+  background: #f3f4f6;
+  border: 1px solid #7f8c8d;
+  border-top: none;
+  border-radius: 0;
+  color: #000000;
+}
+
+.paper-mode-overlay h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.paper-mode-overlay p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 400px;
+  margin-bottom: 1.5rem;
+}
+
+/* Typing Input Panel */
+.input-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.typing-input {
+  width: 100%;
+  min-height: 150px;
+  max-height: 250px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.typing-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+}
+
+.sssc-exam-theme .typing-input {
+  border-radius: 0;
+  border: 1px solid #7f8c8d;
+  background: #ffffff;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  box-shadow: none;
+}
+
+.sssc-exam-theme .typing-input:focus {
+  border-color: #002244;
+}
+
+/* Virtual Keyboard */
+.keyboard-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  max-width: 850px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.sssc-exam-theme .keyboard-panel {
+  display: none; /* Hide keyboard in standard SSSC exam layout */
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.key {
+  min-width: 42px;
+  height: 42px;
+  background: var(--keyboard-key-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.05s ease;
+  position: relative;
+}
+
+.key .sub-char {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  position: absolute;
+  top: 3px;
+  right: 5px;
+}
+
+.key.active {
+  background: var(--keyboard-key-active);
+  color: white;
+  transform: scale(0.95);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+/* Special Keys widths */
+.key-backspace { width: 80px; }
+.key-tab { width: 65px; }
+.key-caps { width: 75px; }
+.key-enter { width: 85px; }
+.key-shift-l { width: 100px; }
+.key-shift-r { width: 105px; }
+.key-space { width: 320px; }
+.key-ctrl { width: 65px; }
+
+/* Language Layout specific key labels */
+.key-double-char {
+  justify-content: space-around;
+  padding: 2px 0;
+}
+
+/* Result Dashboard Overlay */
+.results-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.results-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.results-content {
+  background: var(--bg-color);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.sssc-exam-theme .results-content {
+  border-radius: 0;
+  border: 2px solid #000000;
+}
+
+.results-header {
+  background: var(--accent-gradient);
+  color: white;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sssc-exam-theme .results-header {
+  background: #002244;
+  border-bottom: 2px solid #000000;
+}
+
+.results-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.result-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sssc-exam-theme .result-card {
+  border-radius: 0;
+  border: 1px solid #7f8c8d;
+  background: #f9fafb;
+}
+
+.result-card.success-border {
+  border-color: var(--success-color);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.result-card.error-border {
+  border-color: var(--error-color);
+  background: rgba(244, 63, 94, 0.05);
+}
+
+.result-val {
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.result-card.success-border .result-val { color: var(--success-color); }
+.result-card.error-border .result-val { color: var(--error-color); }
+
+.result-lbl {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Custom Diff Evaluation Panel */
+.diff-container {
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.sssc-exam-theme .diff-container {
+  border-radius: 0;
+  border: 1px solid #7f8c8d;
+}
+
+.diff-header {
+  background: var(--panel-header-bg);
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.diff-body {
+  padding: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  max-height: 250px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.15);
+  white-space: pre-wrap;
+}
+
+.sssc-exam-theme .diff-body {
+  background: #ffffff;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  font-size: 1.05rem;
+}
+
+/* Diff coloring classes */
+.diff-match {
+  color: var(--text-primary);
+}
+.sssc-exam-theme .diff-match {
+  color: #333333;
+}
+
+.diff-error {
+  color: var(--error-color);
+  text-decoration: line-through;
+  background: rgba(244, 63, 94, 0.15);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.diff-omitted {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+  border-bottom: 2px dashed #3b82f6;
+  padding: 0 2px;
+  font-weight: 600;
+}
+
+.diff-inserted {
+  color: var(--warning-color);
+  background: rgba(245, 158, 11, 0.15);
+  border-bottom: 2px dotted var(--warning-color);
+  padding: 0 2px;
+}
+
+.diff-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* Graphic Chart container */
+.chart-container {
+  height: 200px;
+  width: 100%;
+  position: relative;
+  margin-top: 1rem;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* History and Custom Passage panels */
+.secondary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .secondary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Custom passage drawer */
+.custom-passage-area {
+  width: 100%;
+  height: 120px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  resize: none;
+  margin-bottom: 0.75rem;
+}
+
+.sssc-exam-theme .custom-passage-area {
+  background: #ffffff;
+  border: 1px solid #7f8c8d;
+  color: #000000;
+  border-radius: 0;
+}
+
+/* History log */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.history-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.sssc-exam-theme .history-item {
+  border-radius: 0;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.history-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.history-title {
+  font-weight: 600;
+}
+
+.history-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.history-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.history-stat-badge {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+.history-stat-badge.qualified {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success-color);
+}
+
+.history-stat-badge.unqualified {
+  background: rgba(244, 63, 94, 0.15);
+  color: var(--error-color);
+}
+
+/* Utility classes */
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+.gap-sm {
+  gap: 0.5rem;
+}
+
+/* Finger placement guide overlay */
+.keyboard-guide {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.color-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+/* Finger Colors on Keys (Premium Aesthetic) */
+.finger-l-pinky { border-top: 2px solid #ec4899 !important; }
+.finger-l-ring { border-top: 2px solid #a855f7 !important; }
+.finger-l-middle { border-top: 2px solid #6366f1 !important; }
+.finger-l-index { border-top: 2px solid #3b82f6 !important; }
+.finger-r-index { border-top: 2px solid #06b6d4 !important; }
+.finger-r-middle { border-top: 2px solid #14b8a6 !important; }
+.finger-r-ring { border-top: 2px solid #10b981 !important; }
+.finger-r-pinky { border-top: 2px solid #84cc16 !important; }
+.finger-thumb { border-top: 2px solid #f59e0b !important; }
