@@ -88,6 +88,10 @@
               <input type="checkbox" id="highlightWords" checked>
               <span>Highlight Current Word</span>
             </label>
+            <label class="checkbox-group" title="Plays mechanical/tactile sound effects for keystrokes.">
+              <input type="checkbox" id="enableSound" checked>
+              <span>Keystroke Sound</span>
+            </label>
           </div>
         </div>
       </div>
@@ -205,7 +209,8 @@
           <select id="customPassageLang">
             <option value="english">English</option>
             <option value="punjabi">Punjabi</option>
-            <option value="hindi">Hindi</option>
+            <option value="hindi">Hindi (Inscript)</option>
+            <option value="hindi_remington">Hindi (Remington Gail)</option>
           </select>
           <button id="loadCustomBtn" class="btn btn-primary">
             <i class="fa-solid fa-check"></i> Load Custom Passage
@@ -294,6 +299,7 @@
             <div class="legend-item"><span class="legend-color" style="background: #f43f5e; text-decoration: line-through;"></span> Incorrect (Spelling Error)</div>
             <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> Omitted Word (Skipped)</div>
             <div class="legend-item"><span class="legend-color" style="background: #f59e0b;"></span> Extra Word (Inserted)</div>
+            <div class="legend-item"><span class="legend-color" style="background: #94a3b8; opacity: 0.5;"></span> Untyped (Remaining)</div>
           </div>
         </div>
 
