@@ -182,6 +182,8 @@ let speedHistory = []; // Timeline of WPM snapshots [{time: "0:10", wpm: 32}]
 let currentSnapshotInterval = 10; // seconds
 let snapshotTimer = 0;
 let lastPassageId = '';
+let enableSound = true;
+let audioCtx = null;
 
 // DOM Elements
 const themeToggle = document.getElementById('themeToggle');
@@ -231,6 +233,7 @@ const customPassageLang = document.getElementById('customPassageLang');
 const loadCustomBtn = document.getElementById('loadCustomBtn');
 const historyList = document.getElementById('historyList');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const enableSoundCb = document.getElementById('enableSound');
 
 // Initial Setup
 window.addEventListener('DOMContentLoaded', () => {
@@ -244,6 +247,12 @@ window.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('theme') === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
     themeToggle.checked = true;
+  }
+
+  // Sound preference check
+  if (localStorage.getItem('keystrokeSound') === 'false') {
+    enableSound = false;
+    enableSoundCb.checked = false;
   }
 });
 
@@ -314,6 +323,15 @@ function setupEventListeners() {
   highlightWordsCb.addEventListener('change', (e) => {
     highlightWords = e.target.checked;
     renderSourceTextSpans();
+  });
+
+  enableSoundCb.addEventListener('change', (e) => {
+    enableSound = e.target.checked;
+    localStorage.setItem('keystrokeSound', enableSound);
+    if (enableSound) {
+      initAudio();
+      playClick(' ');
+    }
   });
 
   // Modes
@@ -534,6 +552,14 @@ function renderSourceTextSpans() {
 
 // Keyboard Interception Handlers
 function handleKeydown(e) {
+  initAudio();
+  if (enableSound && !e.repeat) {
+    const isSpecialSystemKey = e.key.startsWith('F') && e.key.length > 1;
+    if (e.key !== 'Escape' && !isSpecialSystemKey) {
+      playClick(e.key);
+    }
+  }
+
   if (!isRunning && typingBox.disabled === false) {
     startTest();
   }
@@ -687,6 +713,7 @@ function updateLiveStats() {
 function startTest() {
   if (isRunning) return;
   
+  initAudio();
   isRunning = true;
   typingBox.disabled = false;
   typingBox.focus();
@@ -784,12 +811,16 @@ function resetTest() {
   }
 }
 
-// Word-by-Word Alignment Algorithm (Needleman-Wunsch/Levenshtein backtracking)
+// Word-by-Word Alignment Algorithm (Semi-global prefix alignment)
 function alignWords(sourceWords, typedWords) {
   const n = sourceWords.length;
   const m = typedWords.length;
   
-  // Initialize DP matrices
+  if (m === 0) {
+    return sourceWords.map(w => ({ type: 'untyped', source: w, typed: '' }));
+  }
+  
+  // Initialize DP matrix
   const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
   
   for (let i = 0; i <= n; i++) dp[i][0] = i;
@@ -809,9 +840,31 @@ function alignWords(sourceWords, typedWords) {
     }
   }
   
-  // Backtrack to find alignment operations
-  let i = n, j = m;
+  // Find the optimal end position in sourceWords (bestI) that aligns all m typed words.
+  // Words after bestI in sourceWords are untyped remaining words with zero penalty.
+  let bestI = m <= n ? m : n;
+  let minCost = dp[bestI][m];
+  
+  for (let i = 1; i <= n; i++) {
+    if (dp[i][m] < minCost) {
+      minCost = dp[i][m];
+      bestI = i;
+    } else if (dp[i][m] === minCost) {
+      // Tie-breaking: prefer position closest to m to prevent leaping ahead across document
+      if (Math.abs(i - m) < Math.abs(bestI - m)) {
+        bestI = i;
+      }
+    }
+  }
+  
+  // Backtrack from (bestI, m)
+  let i = bestI, j = m;
   const alignment = [];
+  
+  // Any words in source beyond bestI are remaining untyped words
+  for (let k = n - 1; k >= bestI; k--) {
+    alignment.push({ type: 'untyped', source: sourceWords[k], typed: '' });
+  }
   
   while (i > 0 || j > 0) {
     if (i > 0 && j > 0 && sourceWords[i - 1].toLowerCase() === typedWords[j - 1].toLowerCase()) {
@@ -844,17 +897,29 @@ function evaluateResults() {
   
   // Calculate Alignment
   const aligned = alignWords(sourceWords, typedWords);
-  
+
   let matchCount = 0;
   let substitutionCount = 0;
   let omissionCount = 0;
   let insertionCount = 0;
+  let untypedCount = 0;
   
   // Format HTML diff view
   diffViewer.innerHTML = '';
   
   aligned.forEach(item => {
     const span = document.createElement('span');
+    
+    // Words at the end of the passage that the user never reached
+    if (item.type === 'untyped') {
+      span.className = 'diff-untyped';
+      span.textContent = item.source + ' ';
+      span.title = 'Untyped (Remaining)';
+      diffViewer.appendChild(span);
+      untypedCount++;
+      return;
+    }
+
     if (item.type === 'match') {
       span.className = 'diff-match';
       span.textContent = item.source + ' ';
@@ -1135,16 +1200,34 @@ function clearHistory() {
 
 // Custom passages importing
 function loadCustomPassage() {
-  const text = customPassageText.value.trim();
+  const rawText = customPassageText.value.trim();
   const lang = customPassageLang.value;
   
-  if (!text) {
+  if (!rawText) {
     alert("Please paste some text before loading.");
     return;
   }
+
+  // Normalize custom passage text for typing practice:
+  // Convert smart quotes, dashes, non-breaking spaces, carriage returns, and normalize whitespace
+  const text = rawText
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/\r\n/g, ' ')
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/[ \u00A0\u200B]+/g, ' ')
+    .trim();
   
   const id = `custom_${Date.now()}`;
-  const title = `My Text - ${text.substring(0, 20)}...`;
+  const title = `My Text - ${text.substring(0, 25)}...`;
+
+  // Synchronize language if different
+  if (selectedLanguage !== lang) {
+    selectedLanguage = lang;
+    langSelect.value = lang;
+    renderKeyboard();
+  }
   
   const passageObj = { id, title, text, lang };
   customPassages.push(passageObj);
@@ -1167,6 +1250,11 @@ function openReferenceModal() {
 
 // Automatically change the sample text to a new random one
 function loadNextRandomPassage() {
+  // If user is practicing a custom passage, keep it active for repeated practice
+  if (passageSelect.value && passageSelect.value.startsWith('custom_')) {
+    return;
+  }
+
   const options = Array.from(passageSelect.options);
   if (options.length <= 1) return; // Only 1 passage available
   
@@ -1178,4 +1266,170 @@ function loadNextRandomPassage() {
   
   passageSelect.value = randomOption.value;
   loadSelectedPassage();
+}
+
+// Initialize Web Audio context
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+// Synthesize mechanical keyboard keystroke sound dynamically
+function playClick(key) {
+  if (!enableSound || !audioCtx) return;
+  
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  const now = audioCtx.currentTime;
+  
+  // Cache a 100ms noise buffer to avoid recreating it on every keypress
+  if (!window.cachedNoiseBuffer) {
+    const bufferSize = audioCtx.sampleRate * 0.1; // 100ms
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    window.cachedNoiseBuffer = buffer;
+  }
+  
+  // Base parameters for standard keys (very crisp and tactile)
+  let thudFreq = 115;
+  let thudDecay = 0.035;
+  let thudVolume = 0.30; // Increased low thunk
+  
+  let clickFreq = 5500;
+  let clickDecay = 0.010;
+  let clickVolume = 0.09;
+  
+  let popFreq = 750;
+  let popDecay = 0.020;
+  let popVolume = 0.16; // Increased plastic snap resonance
+  
+  let sharpClickVolume = 0.12; // Snap/tick component
+  let sharpClickFreq = 6500;
+
+  if (key === ' ') {
+    // Spacebar: deeper, hollower stabilizer thud
+    thudFreq = 85;
+    thudDecay = 0.065;
+    thudVolume = 0.40;
+    
+    popFreq = 380;
+    popDecay = 0.045;
+    popVolume = 0.18;
+    
+    clickVolume = 0.01;
+    sharpClickVolume = 0.03;
+    sharpClickFreq = 4000;
+  } else if (key === 'Backspace') {
+    // Backspace: softer mechanical feedback
+    thudFreq = 95;
+    thudDecay = 0.045;
+    thudVolume = 0.28;
+    
+    popFreq = 520;
+    popDecay = 0.030;
+    popVolume = 0.12;
+    
+    clickVolume = 0.03;
+    sharpClickVolume = 0.05;
+    sharpClickFreq = 5000;
+  } else if (key === 'Enter') {
+    // Enter: bright and distinct snappy click
+    thudFreq = 125;
+    thudDecay = 0.040;
+    thudVolume = 0.32;
+    
+    popFreq = 850;
+    popDecay = 0.025;
+    popVolume = 0.20;
+    
+    clickFreq = 6500;
+    clickDecay = 0.012;
+    clickVolume = 0.14;
+    sharpClickVolume = 0.16;
+    sharpClickFreq = 7000;
+  } else {
+    // Humanize standard keys to prevent robotic sound
+    const variation = (Math.random() - 0.5) * 0.15; // +/- 7.5% variation
+    thudFreq *= (1 + variation);
+    thudDecay *= (1 + variation * 0.2);
+    popFreq *= (1 + variation * 0.5);
+    clickFreq *= (1 + variation * 0.3);
+    sharpClickFreq *= (1 + variation * 0.2);
+  }
+  
+  // 1. Low-frequency "thud" (representing bottoming out plate impact)
+  const thudOsc = audioCtx.createOscillator();
+  const thudGain = audioCtx.createGain();
+  thudOsc.type = 'triangle';
+  thudOsc.frequency.setValueAtTime(thudFreq, now);
+  thudOsc.frequency.exponentialRampToValueAtTime(thudFreq * 0.6, now + thudDecay);
+  
+  thudGain.gain.setValueAtTime(thudVolume, now);
+  thudGain.gain.exponentialRampToValueAtTime(0.001, now + thudDecay);
+  
+  thudOsc.connect(thudGain);
+  thudGain.connect(audioCtx.destination);
+  thudOsc.start(now);
+  thudOsc.stop(now + thudDecay);
+
+  // 2. Mid-frequency "pop" (representing keycap hollow plastic resonance)
+  const noiseSource = audioCtx.createBufferSource();
+  noiseSource.buffer = window.cachedNoiseBuffer;
+  
+  const popFilter = audioCtx.createBiquadFilter();
+  popFilter.type = 'bandpass';
+  popFilter.frequency.setValueAtTime(popFreq, now);
+  popFilter.Q.setValueAtTime(3.5, now); // Narrower Q for distinct tone
+  
+  const popGain = audioCtx.createGain();
+  popGain.gain.setValueAtTime(popVolume, now);
+  popGain.gain.exponentialRampToValueAtTime(0.001, now + popDecay);
+  
+  noiseSource.connect(popFilter);
+  popFilter.connect(popGain);
+  popGain.connect(audioCtx.destination);
+  noiseSource.start(now);
+  noiseSource.stop(now + popDecay);
+  
+  // 3. High-frequency click noise (representing leaf friction)
+  const clickNoiseSource = audioCtx.createBufferSource();
+  clickNoiseSource.buffer = window.cachedNoiseBuffer;
+  
+  const clickFilter = audioCtx.createBiquadFilter();
+  clickFilter.type = 'highpass';
+  clickFilter.frequency.setValueAtTime(clickFreq, now);
+  
+  const clickGain = audioCtx.createGain();
+  clickGain.gain.setValueAtTime(clickVolume, now);
+  clickGain.gain.exponentialRampToValueAtTime(0.001, now + clickDecay);
+  
+  clickNoiseSource.connect(clickFilter);
+  clickFilter.connect(clickGain);
+  clickGain.connect(audioCtx.destination);
+  clickNoiseSource.start(now);
+  clickNoiseSource.stop(now + clickDecay);
+
+  // 4. Sharp leaf sweep snap (gives the distinct high-frequency mechanical tactile "tick")
+  const leafOsc = audioCtx.createOscillator();
+  const leafGain = audioCtx.createGain();
+  leafOsc.type = 'sine';
+  leafOsc.frequency.setValueAtTime(sharpClickFreq, now);
+  leafOsc.frequency.exponentialRampToValueAtTime(sharpClickFreq * 0.5, now + 0.006); // Extremely fast 6ms sweep
+  
+  leafGain.gain.setValueAtTime(sharpClickVolume, now);
+  leafGain.gain.exponentialRampToValueAtTime(0.001, now + 0.006);
+  
+  leafOsc.connect(leafGain);
+  leafGain.connect(audioCtx.destination);
+  leafOsc.start(now);
+  leafOsc.stop(now + 0.006);
 }
