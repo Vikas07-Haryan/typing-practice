@@ -918,6 +918,17 @@ input:checked + .slider:before {
   padding: 0 2px;
 }
 
+.diff-untyped {
+  color: var(--text-secondary);
+  opacity: 0.45;
+  user-select: none;
+}
+
+.sssc-exam-theme .diff-untyped {
+  color: #888888;
+  opacity: 0.6;
+}
+
 .diff-legend {
   display: flex;
   flex-wrap: wrap;
